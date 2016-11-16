@@ -285,24 +285,36 @@
 
     if (typeof path === 'object') {
       if (path.mp4) {
-        sources += '<source src="' + path.mp4 + '.mp4" type="video/mp4">';
+        /*
+         * If we find a '?' we can assume that there are query parameters in this
+         * string and that our previous checks did not remove any file extensions.
+         * We therefore don't need to put on our own extension.
+         */
+        sources += path.mp4.indexOf('?') !== -1 ? '<source src="' + path.mp4 + '" type="video/mp4">' : '<source src="' + path.mp4 + '.mp4" type="video/mp4">';
       }
 
       if (path.webm) {
-        sources += '<source src="' + path.webm + '.webm" type="video/webm">';
+        sources += path.webm.indexOf('?') !== -1 ? '<source src="' + path.webm + '" type="video/webm">' : '<source src="' + path.webm + '.webm" type="video/webm">';
       }
 
       if (path.ogv) {
-        sources += '<source src="' + path.ogv + '.ogv" type="video/ogg">';
+        sources += path.ogb.indexOf('?') !== -1  ? '<source src="' + path.ogv + '" type="video/ogg">' : '<source src="' + path.ogv + '.ogv" type="video/ogg">';
       }
 
       $video = vide.$video = $('<video>' + sources + '</video>');
     } else {
-      $video = vide.$video = $('<video>' +
-        '<source src="' + path + '.mp4" type="video/mp4">' +
-        '<source src="' + path + '.webm" type="video/webm">' +
-        '<source src="' + path + '.ogv" type="video/ogg">' +
-        '</video>');
+      if (path.indexOf('?') !== -1) {
+        console.warn('You didn\'t specify a video format for me (vide), I\'m going to guess it\'s Mp4. You should really be explicit though.');
+        $video = vide.$video = $('<video>' +
+          '<source src="' + path + '" type="video/mp4">' +
+          '</video>');
+      } else {
+        $video = vide.$video = $('<video>' +
+          '<source src="' + path + '.mp4" type="video/mp4">' +
+          '<source src="' + path + '.webm" type="video/webm">' +
+          '<source src="' + path + '.ogv" type="video/ogg">' +
+          '</video>');
+      }
     }
 
     // https://github.com/VodkaBears/Vide/issues/110
